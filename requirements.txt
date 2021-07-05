@@ -1,3 +1,4 @@
 git+https://github.com/Rapptz/discord.py
 asyncio
 python-wowapi==4.0.0
+git+git://github.com/lockwooddev/python-wowapi
