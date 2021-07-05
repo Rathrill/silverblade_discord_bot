@@ -99,7 +99,11 @@ async def xp(ctx):
         applicant(applicants, ctx.author)["xp"] = ctx.message.content.split(None, 1)[1]
         await ctx.author.send(APPLICATION_PROVIDED_XP)
 
-
+@bot.command(pass_context=True)
+@commands.cooldown(1, 1, commands.BucketType.user)
+async def exp(ctx):
+    await xp.invoke(ctx)
+        
 @bot.command()
 @commands.cooldown(1, 5, commands.BucketType.user)
 async def done(ctx):
