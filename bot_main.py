@@ -315,3 +315,5 @@ async def about(ctx):
 
 
 bot.run(os.getenv('DISCORD_TOKEN'))
+
+bot_music.setup(bot)
