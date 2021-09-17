@@ -313,7 +313,6 @@ async def times(ctx):
 async def about(ctx):
     await ctx.send(ABOUT)
 
+bot_music.setup(bot)
 
 bot.run(os.getenv('DISCORD_TOKEN'))
-
-bot_music.setup(bot)
