@@ -8,6 +8,8 @@ from datetime import datetime
 from bot_text_resources import *
 from bot_config import *
 
+import bot_music
+
 class GuildRoles:
     ROLE_FRIEND = "Friend"
     ROLE_INITIATE = "Initiate"
