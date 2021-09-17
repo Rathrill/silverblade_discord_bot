@@ -313,6 +313,11 @@ async def times(ctx):
 async def about(ctx):
     await ctx.send(ABOUT)
 
-bot_music.setup(bot)
+@bot.command(pass_context=True)
+@commands.cooldown(1, 30, commands.BucketType.user)
+async def play(ctx):
+    await ctx.send("Coming soon! I don't support it yet though =/")
+
+# bot_music.setup(bot)
 
 bot.run(os.getenv('DISCORD_TOKEN'))
