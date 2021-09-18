@@ -71,12 +71,17 @@ class YTDLSource(discord.PCMVolumeTransformer):
         to_run = partial(ytdl.extract_info, url=search, download=download)
         data = await loop.run_in_executor(None, to_run)
 
+        count = 1
+
         if 'entries' in data:
+            count = len(data['entries'])
             # take first item from a playlist
             data = data['entries'][0]
 
-        embed = discord.Embed(title="", description=f"Queued [{data['title']}]({data['webpage_url']})\n\nRequested by {ctx.author.mention}", color=discord.Color.green())
-        embed.set_image(url=f"https://img.youtube.com/vi/{data['webpage_url'].split('=')[1]}/hqdefault.jpg")
+        embed = discord.Embed(description=f"Position in queue\n{count}", title=f"[{data['title']}]({data['webpage_url']})", color=discord.Color.green())
+        embed.set_thumbnail(url=f"https://img.youtube.com/vi/{data['webpage_url'].split('=')[1]}/hqdefault.jpg")
+        embed.set_author(name="Added to queue", icon_url=ctx.author.avatar_url)
+
         await ctx.send(embed=embed)
 
         if download:
