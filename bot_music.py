@@ -1,4 +1,4 @@
-# Credits to Aditya Tomar
+# Credits to Aditya Tomar/Paul who totally did all of this. honest. totally
 
 import discord
 from discord.ext import commands
