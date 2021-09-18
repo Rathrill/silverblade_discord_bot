@@ -78,7 +78,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # take first item from a playlist
             data = data['entries'][0]
 
-        embed = discord.Embed(title="", description=f"[{data['title']}]({data['webpage_url']})\n\n**Position in queue**\n{count}\n\n**Length**\n", color=discord.Color.black())
+        embed = discord.Embed(title="", description=f"[{data['title']}]({data['webpage_url']})\n\n**Position in queue**\n{count}\n\n**Length**\n3:37", color=discord.Color.dark_grey())
         embed.set_thumbnail(url=f"https://img.youtube.com/vi/{data['webpage_url'].split('=')[1]}/hqdefault.jpg")
         embed.set_author(name="Added to queue", icon_url=ctx.author.avatar_url)
 
@@ -156,7 +156,7 @@ class MusicPlayer:
             self.current = source
 
             self._guild.voice_client.play(source, after=lambda _: self.bot.loop.call_soon_threadsafe(self.next.set))
-            embed = discord.Embed(title="Now playing", description=f"[{source.title}]({source.web_url})\n\nRequested by {source.requester.mention}", color=discord.Color.green())
+            embed = discord.Embed(title="Now playing", description=f"[{source.title}]({source.web_url})\n\nRequested by {source.requester.mention}\n\n**Length**\n3:37", color=discord.Color.green())
             embed.set_thumbnail(url=f"https://img.youtube.com/vi/{source.web_url.split('=')[1]}/hqdefault.jpg")
             self.np = await self._channel.send(embed=embed)
             await self.next.wait()
