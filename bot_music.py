@@ -77,7 +77,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # take first item from a playlist
             data = data['entries'][0]
 
-        seconds = data.duration % (24 * 3600) 
+        seconds = self.duration % (24 * 3600) 
         hour = seconds // 3600
         seconds %= 3600
         minutes = seconds // 60
@@ -367,7 +367,7 @@ class Music(commands.Cog):
             embed = discord.Embed(title="", description="queue is empty", color=discord.Color.green())
             return await ctx.send(embed=embed)
 
-        seconds = vc.source.duration % (24 * 3600) 
+        seconds = vc.source.duration % (24 * 3600)
         hour = seconds // 3600
         seconds %= 3600
         minutes = seconds // 60
