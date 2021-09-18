@@ -65,20 +65,29 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return self.__getattribute__(item)
 
     @classmethod
-    async def create_source(cls, ctx, search: str, *, loop, download=False):
+    async def create_source(cls, ctx, search: str, *, loop, download=False, queue_size):
         loop = loop or asyncio.get_event_loop()
 
         to_run = partial(ytdl.extract_info, url=search, download=download)
         data = await loop.run_in_executor(None, to_run)
 
-        count = 1
+        count = queue_size()
 
         if 'entries' in data:
-            count = len(data['entries'])
             # take first item from a playlist
             data = data['entries'][0]
 
-        embed = discord.Embed(title="", description=f"[{data['title']}]({data['webpage_url']})\n\n**Position in queue**\n{count}\n\n**Length**\n3:37", color=discord.Color.dark_grey())
+        seconds = data.duration % (24 * 3600) 
+        hour = seconds // 3600
+        seconds %= 3600
+        minutes = seconds // 60
+        seconds %= 60
+        if hour > 0:
+            duration = "%dh %02dm %02ds" % (hour, minutes, seconds)
+        else:
+            duration = "%02dm %02ds" % (minutes, seconds)
+
+        embed = discord.Embed(title="", description=f"[{data['title']}]({data['webpage_url']})\n\n**Position in queue**\n{count}\n\n**Length**\n{duration}", color=discord.Color.dark_grey())
         embed.set_thumbnail(url=f"https://img.youtube.com/vi/{data['webpage_url'].split('=')[1]}/hqdefault.jpg")
         embed.set_author(name="Added to queue", icon_url=ctx.author.avatar_url)
 
@@ -123,7 +132,7 @@ class MusicPlayer:
         self.next = asyncio.Event()
 
         self.np = None  # Now playing message
-        self.volume = .5
+        self.volume = 1.0
         self.current = None
 
         ctx.bot.loop.create_task(self.player_loop())
@@ -155,8 +164,18 @@ class MusicPlayer:
             source.volume = self.volume
             self.current = source
 
+            seconds = self.current.duration % (24 * 3600) 
+            hour = seconds // 3600
+            seconds %= 3600
+            minutes = seconds // 60
+            seconds %= 60
+            if hour > 0:
+                duration = "%dh %02dm %02ds" % (hour, minutes, seconds)
+            else:
+                duration = "%02dm %02ds" % (minutes, seconds)
+
             self._guild.voice_client.play(source, after=lambda _: self.bot.loop.call_soon_threadsafe(self.next.set))
-            embed = discord.Embed(title="Now playing", description=f"[{source.title}]({source.web_url})\n\nRequested by {source.requester.mention}\n\n**Length**\n3:37", color=discord.Color.green())
+            embed = discord.Embed(title="Now playing", description=f"[{source.title}]({source.web_url})\n\nRequested by {source.requester.mention}\n\n**Length**\n{duration}", color=discord.Color.green())
             embed.set_thumbnail(url=f"https://img.youtube.com/vi/{source.web_url.split('=')[1]}/hqdefault.jpg")
             self.np = await self._channel.send(embed=embed)
             await self.next.wait()
@@ -277,37 +296,9 @@ class Music(commands.Cog):
 
         # If download is False, source will be a dict which will be used later to regather the stream.
         # If download is True, source will be a discord.FFmpegPCMAudio with a VolumeTransformer.
-        source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False)
+        source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False, lambda: player.queue.qsize())
 
         await player.queue.put(source)
-
-    @commands.command(name='pause', description="pauses music")
-    async def pause_(self, ctx):
-        """Pause the currently playing song."""
-        vc = ctx.voice_client
-
-        if not vc or not vc.is_playing():
-            embed = discord.Embed(title="", description="I am currently not playing anything", color=discord.Color.green())
-            return await ctx.send(embed=embed)
-        elif vc.is_paused():
-            return
-
-        vc.pause()
-        await ctx.send("Paused ⏸️")
-
-    @commands.command(name='resume', description="resumes music")
-    async def resume_(self, ctx):
-        """Resume the currently paused song."""
-        vc = ctx.voice_client
-
-        if not vc or not vc.is_connected():
-            embed = discord.Embed(title="", description="I'm not connected to a voice channel", color=discord.Color.green())
-            return await ctx.send(embed=embed)
-        elif not vc.is_paused():
-            return
-
-        vc.resume()
-        await ctx.send("Resuming ⏯️")
 
     @commands.command(name='skip', description="skips to next song in queue")
     async def skip_(self, ctx):
