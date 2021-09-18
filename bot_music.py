@@ -296,7 +296,7 @@ class Music(commands.Cog):
 
         # If download is False, source will be a dict which will be used later to regather the stream.
         # If download is True, source will be a discord.FFmpegPCMAudio with a VolumeTransformer.
-        source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False, lambda: player.queue.qsize())
+        source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False, queue_size=lambda: player.queue.qsize())
 
         await player.queue.put(source)
 
