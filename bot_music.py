@@ -77,7 +77,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # take first item from a playlist
             data = data['entries'][0]
 
-        seconds = self.duration % (24 * 3600) 
+        seconds = data['duration'] % (24 * 3600)
         hour = seconds // 3600
         seconds %= 3600
         minutes = seconds // 60
