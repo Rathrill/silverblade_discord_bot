@@ -78,7 +78,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # take first item from a playlist
             data = data['entries'][0]
 
-        embed = discord.Embed(description=f"Position in queue\n{count}", title=f"[{data['title']}]({data['webpage_url']})", color=discord.Color.green())
+        embed = discord.Embed(title="", description=f"[{data['title']}]({data['webpage_url']})\n\n**Position in queue**\n{count}\n\n**Length**\n", color=discord.Color.black())
         embed.set_thumbnail(url=f"https://img.youtube.com/vi/{data['webpage_url'].split('=')[1]}/hqdefault.jpg")
         embed.set_author(name="Added to queue", icon_url=ctx.author.avatar_url)
 
